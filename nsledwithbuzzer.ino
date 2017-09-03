@@ -1,16 +1,9 @@
-/*
- ESP8266 Blink by Simon Peter
- Blink the blue LED on the ESP-01 module
- This example code is in the public domain
- 
- The blue LED on the ESP-01 module is connected to GPIO1 
- (which is also the TXD pin; so we cannot use Serial.print() at the same time)
- 
- Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
-*/
+#include "config.h"
+
 #include <ESP8266WiFi.h>
-const char* ssid     = "southofheaven";
-const char* password = "papaja29";
+
+int sound_pin = 13;
+int led_pin = 12;
 
 void setup() {
   pinMode(12, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
@@ -37,15 +30,19 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-// the loop function runs over and over again forever
+void start_sound (int freq, int sound_delay) {
+  analogWriteFreq(100);
+  analogWrite(sound_pin, freq);
+  delay(sound_delay);
+  analogWrite(sound_pin, 0);
+}
+
 void loop() {
-//  analogWriteFreq(20);
-//  analogWrite(13, 100);
-  digitalWrite(12, LOW);   // Turn the LED on (Note that LOW is the voltage level
-                                    // but actually the LED is on; this is because 
-                                    // it is acive low on the ESP-01)
-  delay(500);                      // Wait for a second
-  digitalWrite(12, HIGH);  // Turn the LED off by making the voltage HIGH
-  analogWrite(13, 0);
-  delay(1000);                      // Wait for two seconds (to demonstrate the active low LED)
+
+  digitalWrite(led_pin, LOW);
+  delay(500);                      
+  start_sound(1500, 300);
+  digitalWrite(led_pin, HIGH);  
+  delay(1000);                      
+
 }
