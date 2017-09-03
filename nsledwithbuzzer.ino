@@ -22,16 +22,9 @@ int statusCode = 0;
 DynamicJsonBuffer  jsonBuffer;
 
 void setup() {
-  pinMode(12, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  pinMode(led_pin, OUTPUT);
   Serial.begin(115200);
   delay(10);
-
-  // We start by connecting to a WiFi network
-
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
 
   DEBUG_PRINT("Connecting to ");
   DEBUG_PRINTLN(ssid);
@@ -56,11 +49,7 @@ void start_sound (int freq, int sound_delay) {
 }
 
 void loop() {
-  digitalWrite(led_pin, LOW);
-  delay(500);                      
-  start_sound(1500, 300);
-  digitalWrite(led_pin, HIGH);  
-  delay(1000);
+  
   DEBUG_PRINTLN("making GET request");
   client.get("/pebble");
 
@@ -119,10 +108,7 @@ void loop() {
   DEBUG_PRINTLN(" seconds.");
   
   if (parakeet_last_seen > 900) {
-    // Lost parakeet signal after 900 seconds.
     DEBUG_PRINTLN("I lost parakeet signal :(");
-    //- clearDisplay();
-    //- printDisplayError();  
   }
   else {
     // Parakeet operational.
@@ -150,7 +136,14 @@ void loop() {
       DEBUG_PRINT(bwpo);
       DEBUG_PRINT(", change:  ");
       DEBUG_PRINTLN(bgdelta);
-      DEBUG_PRINTLN("Sugar below minimum level."); 
+      DEBUG_PRINTLN("Sugar below minimum level.");
+      for (int x=0; x<3; x++ ) {
+        digitalWrite(led_pin, LOW);
+        delay(500);                      
+        start_sound(1500, 300);
+        digitalWrite(led_pin, HIGH);  
+        delay(1000);
+      }     
     }
     else if (bwpo > max) {
       // Sugar above maximum level.
@@ -159,20 +152,21 @@ void loop() {
       DEBUG_PRINT(", change:  ");
       DEBUG_PRINTLN(bgdelta);
       DEBUG_PRINTLN("Sugar above maximum level.");
+      for (int x=0; x<3; x++ ) {
+        digitalWrite(led_pin, LOW);
+        delay(500);                      
+        start_sound(3000, 300);
+        digitalWrite(led_pin, HIGH);  
+        delay(1000);
+      } 
     }
     else {
       // Sugar ok. 
     }
-    //- clearDisplay();
     DEBUG_PRINTLN("-----");
     DEBUG_PRINTLN(bwpo);
-    String displayString = String(bwpo, DEC);
-    DEBUG_PRINTLN(displayString);
     DEBUG_PRINTLN("-----");
-    //-clearDisplay();
-    //-printDisplayStr(displayString);
-  }
-  
+  }  
   DEBUG_PRINTLN("Wait five seconds");
   delay(6000);
 }
