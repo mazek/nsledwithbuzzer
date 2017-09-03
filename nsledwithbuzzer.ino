@@ -42,7 +42,7 @@ void setup() {
 }
 
 void start_sound (int freq, int sound_delay) {
-  analogWriteFreq(100);
+  analogWriteFreq(freq);
   analogWrite(sound_pin, freq);
   delay(sound_delay);
   analogWrite(sound_pin, 0);
@@ -138,10 +138,10 @@ void loop() {
       DEBUG_PRINTLN(bgdelta);
       DEBUG_PRINTLN("Sugar below minimum level.");
       for (int x=0; x<3; x++ ) {
-        digitalWrite(led_pin, LOW);
+        digitalWrite(led_pin, HIGH);
         delay(500);                      
-        start_sound(1500, 300);
-        digitalWrite(led_pin, HIGH);  
+        start_sound(100, 300);
+        digitalWrite(led_pin, LOW);  
         delay(1000);
       }     
     }
@@ -153,10 +153,10 @@ void loop() {
       DEBUG_PRINTLN(bgdelta);
       DEBUG_PRINTLN("Sugar above maximum level.");
       for (int x=0; x<3; x++ ) {
-        digitalWrite(led_pin, LOW);
+        digitalWrite(led_pin, HIGH);
         delay(500);                      
-        start_sound(3000, 300);
-        digitalWrite(led_pin, HIGH);  
+        start_sound(1000, 300);
+        digitalWrite(led_pin, LOW);  
         delay(1000);
       } 
     }
@@ -167,6 +167,6 @@ void loop() {
     DEBUG_PRINTLN(bwpo);
     DEBUG_PRINTLN("-----");
   }  
-  DEBUG_PRINTLN("Wait five seconds");
-  delay(6000);
+  DEBUG_PRINTLN("Wait fiveteen minutes");
+  delay(900000);
 }
