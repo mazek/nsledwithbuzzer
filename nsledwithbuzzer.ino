@@ -169,4 +169,11 @@ void loop() {
   }  
   DEBUG_PRINTLN("Wait fiveteen minutes");
   delay(900000);
+  // Blink - I'm alive :)
+  for (int x=0; x<3; x++) {
+    digitalWrite(led_pin, HIGH);
+    delay(200);                      
+    digitalWrite(led_pin, LOW);  
+    delay(200);
+  }
 }
