@@ -10,11 +10,20 @@
 int min = 80;
 int max = 160;
 
+int redPin = 4;
+int greenPin = 5;
+int bluePin = 16;
+
+// 0 - unknown, 1 - vero low - red, 2 - too low - yellow, 3 - ok - green, 4 - too high - blue
+int sugar_color = 0;
+
 int sound_pin = 13;
 int led_pin = 12;
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, port);
+
+long rssi = 0;
 
 String response;
 int statusCode = 0;
@@ -23,6 +32,11 @@ DynamicJsonBuffer  jsonBuffer;
 
 void setup() {
   pinMode(led_pin, OUTPUT);
+
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT); 
+    
   Serial.begin(115200);
   delay(10);
 
@@ -48,7 +62,36 @@ void start_sound (int freq, int sound_delay) {
   analogWrite(sound_pin, 0);
 }
 
+void setColor(int red, int green, int blue)
+{
+  #ifdef COMMON_ANODE
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+  #endif
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);  
+}
+
 void loop() {
+  setColor(255, 0, 0);  // red
+  delay(1000);
+  setColor(0, 255, 0);  // green
+  delay(1000);
+  setColor(0, 0, 255);  // blue
+  delay(1000);
+  setColor(255, 255, 0);// yellow
+  delay(1000);  
+  setColor(80, 0, 80);  // purple
+  delay(1000);
+  setColor(0, 255, 255);// aqua
+  delay(1000);
+  setColor(0, 0, 0);// aqua  
+    
+  rssi = WiFi.RSSI();  
+  DEBUG_PRINT("RSSI: ");
+  DEBUG_PRINTLN(rssi);
   
   DEBUG_PRINTLN("making GET request");
   client.get("/pebble");
@@ -129,8 +172,24 @@ void loop() {
       // Sugar is dropping.
       //      bgdelta_s = "%s" % bgdelta
     }
-    
-    if (bwpo < min) {
+
+    if (bwpo <= min-20) {
+      // Sugar below minimum level.
+      DEBUG_PRINT("Sugar: ");
+      DEBUG_PRINT(bwpo);
+      DEBUG_PRINT(", change:  ");
+      DEBUG_PRINTLN(bgdelta);
+      DEBUG_PRINTLN("Sugar below minimum level.");
+      for (int x=0; x<5; x++ ) {
+        digitalWrite(led_pin, HIGH);
+        delay(500);                      
+        start_sound(50, 300);
+        digitalWrite(led_pin, LOW);  
+        delay(1000);
+      }   
+      sugar_color = 1;  
+    }    
+    else if (bwpo > min-20 and bwpo < min) {
       // Sugar below minimum level.
       DEBUG_PRINT("Sugar: ");
       DEBUG_PRINT(bwpo);
@@ -143,7 +202,8 @@ void loop() {
         start_sound(100, 300);
         digitalWrite(led_pin, LOW);  
         delay(1000);
-      }     
+      }
+      sugar_color = 2;     
     }
     else if (bwpo > max) {
       // Sugar above maximum level.
@@ -158,22 +218,49 @@ void loop() {
         start_sound(1000, 300);
         digitalWrite(led_pin, LOW);  
         delay(1000);
-      } 
+      }
+      sugar_color = 4; 
     }
     else {
-      // Sugar ok. 
+      // Sugar ok.
+      sugar_color = 3; 
     }
     DEBUG_PRINTLN("-----");
     DEBUG_PRINTLN(bwpo);
     DEBUG_PRINTLN("-----");
   }  
   DEBUG_PRINTLN("Wait fiveteen minutes");
-  delay(900000);
-  // Blink - I'm alive :)
+  
+  // Blink every five minutes - I'm alive :)
   for (int x=0; x<3; x++) {
-    digitalWrite(led_pin, HIGH);
-    delay(200);                      
-    digitalWrite(led_pin, LOW);  
-    delay(200);
+    for (int z=0; z<300; z++){
+      switch (sugar_color) {
+        case 0:
+          setColor(random(255), random(255), random(255));
+          break;
+        case 1:
+          setColor(255, 0, 0);
+          break;
+        case 2:
+          setColor(255, 255, 0);
+          break;
+        case 3:
+          setColor(0, 255, 0);
+          break;
+        case 4:
+          setColor(0, 0, 255);
+          break;                              
+      }
+      delay(500);      
+      setColor(0, 0, 0);  
+      delay(500);
+    }
+         
+    for (int y=0; y<x+1; y++) {
+      digitalWrite(led_pin, HIGH);
+      delay(500);                      
+      digitalWrite(led_pin, LOW);  
+      delay(500);
+    }
   }
 }
