@@ -47,7 +47,7 @@ void setup() {
   WiFi.begin(ssid, password);
   
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(100);
     Serial.print(".");
   }
 
@@ -75,20 +75,6 @@ void setColor(int red, int green, int blue)
 }
 
 void loop() {
-  setColor(255, 0, 0);  // red
-  delay(1000);
-  setColor(0, 255, 0);  // green
-  delay(1000);
-  setColor(0, 0, 255);  // blue
-  delay(1000);
-  setColor(255, 255, 0);// yellow
-  delay(1000);  
-  setColor(80, 0, 80);  // purple
-  delay(1000);
-  setColor(0, 255, 255);// aqua
-  delay(1000);
-  setColor(0, 0, 0);// aqua  
-    
   rssi = WiFi.RSSI();  
   DEBUG_PRINT("RSSI: ");
   DEBUG_PRINTLN(rssi);
@@ -111,7 +97,7 @@ void loop() {
 
   if (!_data.success()) {
     DEBUG_PRINTLN("parseObject() failed:( ");
-    delay(5000);
+    //delay(5000);
     return;
   }
   else {
@@ -185,7 +171,7 @@ void loop() {
         delay(500);                      
         start_sound(50, 300);
         digitalWrite(led_pin, LOW);  
-        delay(1000);
+        delay(800);
       }   
       sugar_color = 1;  
     }    
@@ -201,7 +187,7 @@ void loop() {
         delay(500);                      
         start_sound(100, 300);
         digitalWrite(led_pin, LOW);  
-        delay(1000);
+        delay(800);
       }
       sugar_color = 2;     
     }
@@ -217,7 +203,7 @@ void loop() {
         delay(500);                      
         start_sound(1000, 300);
         digitalWrite(led_pin, LOW);  
-        delay(1000);
+        delay(800);
       }
       sugar_color = 4; 
     }
@@ -251,16 +237,16 @@ void loop() {
           setColor(0, 0, 255);
           break;                              
       }
-      delay(500);      
+      delay(300);      
       setColor(0, 0, 0);  
-      delay(500);
+      delay(300);
     }
          
     for (int y=0; y<x+1; y++) {
       digitalWrite(led_pin, HIGH);
-      delay(500);                      
+      delay(300);                      
       digitalWrite(led_pin, LOW);  
-      delay(500);
+      delay(300);
     }
   }
 }
