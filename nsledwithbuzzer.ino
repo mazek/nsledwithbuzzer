@@ -14,7 +14,7 @@ int redPin = 4;
 int greenPin = 5;
 int bluePin = 16;
 
-// 0 - unknown, 1 - vero low - red, 2 - too low - yellow, 3 - ok - green, 4 - too high - blue
+// 0 - unknown, 1 - very low - red, 2 - too low - yellow, 3 - ok - green, 4 - too high - blue
 int sugar_color = 0;
 
 int sound_pin = 13;
@@ -27,6 +27,12 @@ long rssi = 0;
 
 String response;
 int statusCode = 0;
+
+char cur_time_s[13];
+char read_time_s[13];
+
+unsigned long  cur_time;
+unsigned long  read_time;
 
 DynamicJsonBuffer  jsonBuffer;
 
@@ -75,6 +81,7 @@ void setColor(int red, int green, int blue)
 }
 
 void loop() {
+  
   rssi = WiFi.RSSI();  
   DEBUG_PRINT("RSSI: ");
   DEBUG_PRINTLN(rssi);
@@ -97,35 +104,25 @@ void loop() {
 
   if (!_data.success()) {
     DEBUG_PRINTLN("parseObject() failed:( ");
-    //delay(5000);
     return;
   }
   else {
     DEBUG_PRINTLN("parseObject() success! ");
   }
- 
-  String cur_time_s = _data["status"][0]["now"];
-  String read_time_s = _data["bgs"][0]["datetime"];
 
+  strncpy(cur_time_s, _data["status"][0]["now"],10);
+  strncpy(read_time_s, _data["bgs"][0]["datetime"],10);  
+  
   DEBUG_PRINT("1. cur_time_s: ");
   DEBUG_PRINT(cur_time_s);
   
   DEBUG_PRINT(", read_time_s: ");
   DEBUG_PRINTLN(read_time_s);
   
-  cur_time_s = cur_time_s.substring(0, cur_time_s.length()-3);
-  read_time_s = read_time_s.substring(0, read_time_s.length()-3);
-
-  DEBUG_PRINT("2. cur_time_s: ");
-  DEBUG_PRINT(cur_time_s);
+  cur_time = atof(cur_time_s);
+  read_time = atof(read_time_s);
   
-  DEBUG_PRINT(", read_time_s: ");
-  DEBUG_PRINTLN(read_time_s);
-  
-  unsigned long  cur_time = cur_time_s.toFloat();
-  unsigned long  read_time = read_time_s.toFloat();
-  
-  DEBUG_PRINT("3. cur_time: ");
+  DEBUG_PRINT("2. cur_time: ");
   DEBUG_PRINT(cur_time);
   
   DEBUG_PRINT(", read_time: ");
